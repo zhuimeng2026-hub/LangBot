@@ -956,6 +956,34 @@ export class BackendClient extends BaseHttpClient {
     return response.data.data;
   }
 
+  // ============ WeChat OAuth API (Redirect Flow) ============
+  public getWeChatAuthorizeUrl(
+    redirectPath?: string,
+  ): Promise<{
+    authorize_url: string;
+  }> {
+    const params: Record<string, string> = {};
+    if (redirectPath) {
+      params.redirect_path = redirectPath;
+    }
+    return this.get('/api/v1/user/wechat/authorize-url', params);
+  }
+
+  public async exchangeWeChatOpenId(openid: string): Promise<{
+    token: string;
+  }> {
+    const response = await this.instance.post('/api/v1/user/wechat/callback', {
+      openid,
+    });
+    if (response.data.code !== 0) {
+      throw {
+        code: response.data.code,
+        msg: response.data.msg || 'Unknown error',
+      };
+    }
+    return response.data.data;
+  }
+
   // ============ Monitoring API ============
   public getMonitoringData(params: {
     botId?: string[];

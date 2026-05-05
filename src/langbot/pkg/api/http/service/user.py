@@ -298,3 +298,24 @@ class UserService:
         await self.ap.provider_service.update_space_model_provider_api_keys(api_key)
 
         return await self.get_user_by_email(space_email)
+
+    async def get_or_create_user_by_openid(self, openid: str) -> user.User:
+        """通过微信 openid 获取或创建用户"""
+        user_email = f'wx_{openid}'
+        existing = await self.get_user_by_email(user_email)
+        if existing:
+            return existing
+
+        await self.ap.persistence_mgr.execute_async(
+            sqlalchemy.insert(user.User).values(
+                user=user_email,
+                password='',
+                account_type='local',
+            )
+        )
+        return await self.get_user_by_email(user_email)
+
+    async def authenticate_by_openid(self, openid: str) -> str:
+        """通过 openid 认证并返回 JWT token"""
+        user_obj = await self.get_or_create_user_by_openid(openid)
+        return await self.generate_jwt_token(user_obj.user)

@@ -71,6 +71,13 @@ export default function HomeLayout({
     }
   }, []);
 
+  // Redirect WeChat OAuth users to simplified chat interface
+  useEffect(() => {
+    if (localStorage.getItem('login_method') === 'wechat') {
+      navigate('/chat', { replace: true });
+    }
+  }, [navigate]);
+
   // Auto-redirect to wizard on first visit (wizard not yet completed on this instance)
   useEffect(() => {
     const checkWizard = async () => {

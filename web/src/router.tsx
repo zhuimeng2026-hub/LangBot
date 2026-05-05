@@ -13,6 +13,8 @@ import RegisterPage from '@/app/register/page';
 import ResetPasswordPage from '@/app/reset-password/page';
 import WizardPage from '@/app/wizard/page';
 import SpaceCallbackPage from '@/app/auth/space/callback/page';
+import WeChatCallbackPage from '@/app/auth/wechat/callback/page';
+import ChatPage from '@/app/chat/page';
 import HomePage from '@/app/home/page';
 import MonitoringPage from '@/app/home/monitoring/page';
 import BotsPage from '@/app/home/bots/page';
@@ -61,6 +63,14 @@ export const router = createBrowserRouter([
   {
     path: '/auth/space/callback',
     element: <SpaceCallbackPage />,
+  },
+  {
+    path: '/auth/wechat/callback',
+    element: <WeChatCallbackPage />,
+  },
+  {
+    path: '/chat',
+    element: <ChatPage />,
   },
   {
     path: '/home',

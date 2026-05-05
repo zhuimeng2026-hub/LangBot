@@ -11,6 +11,7 @@ export default defineConfig({
   },
   server: {
     port: 3000,
+    allowedHosts: ['xchat.aixifs.com', 'localhost', '.aixifs.com'],
   },
   build: {
     outDir: 'dist',

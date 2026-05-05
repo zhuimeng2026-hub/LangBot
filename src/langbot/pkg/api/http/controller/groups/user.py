@@ -2,6 +2,8 @@ import quart
 import argon2
 import asyncio
 import traceback
+import urllib.parse
+import aiohttp
 
 from .. import group
 from .....entity.errors import account as account_errors
@@ -150,6 +152,37 @@ class UserRouterGroup(group.RouterGroup):
             except Exception as e:
                 traceback.print_exc()
                 return self.fail(2, f'OAuth callback failed: {str(e)}')
+
+        # WeChat Official Account OAuth endpoints (via auth gateway)
+
+        @self.route('/wechat/authorize-url', methods=['GET'], auth_type=group.AuthType.NONE)
+        async def _() -> str:
+            wechat_config = self.ap.instance_config.data.get('wechat_oauth', {})
+            if not wechat_config.get('enable'):
+                return self.fail(1, 'WeChat OAuth not enabled')
+
+            app_id = wechat_config.get('app_id', '')
+            gateway_url = wechat_config.get('auth_gateway_url', '')
+
+            if not app_id or not gateway_url:
+                return self.fail(1, 'WeChat OAuth not configured')
+
+            redirect_path = quart.request.args.get('redirect_path', '/auth/wechat/callback')
+            authorize_url = f'{gateway_url}/auth/{app_id}?redirect={urllib.parse.quote(redirect_path, safe="")}'
+
+            return self.success(data={'authorize_url': authorize_url})
+
+        @self.route('/wechat/callback', methods=['POST'], auth_type=group.AuthType.NONE)
+        async def _() -> str:
+            json_data = await quart.request.json
+            openid = json_data.get('openid')
+
+            if not openid:
+                return self.fail(1, 'Missing openid parameter')
+
+            jwt_token = await self.ap.user_service.authenticate_by_openid(openid)
+
+            return self.success(data={'token': jwt_token})
 
         @self.route('/info', methods=['GET'], auth_type=group.AuthType.USER_TOKEN)
         async def _(user_email: str) -> str:

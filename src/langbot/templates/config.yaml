@@ -104,6 +104,11 @@ monitoring:
         check_interval_hours: 1
         # Number of expired rows to delete per table batch
         delete_batch_size: 1000
+wechat_oauth:
+    # WeChat Official Account (服务号) OAuth via auth gateway
+    enable: false
+    app_id: ''
+    auth_gateway_url: 'https://ocbot.aixifs.com'
 space:
     # Space service URL for OAuth and API
     url: 'https://space.langbot.app'

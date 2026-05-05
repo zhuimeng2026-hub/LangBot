@@ -42,6 +42,7 @@ export default function Login() {
   const navigate = useNavigate();
   const { t } = useTranslation();
   const [spaceLoading, setSpaceLoading] = useState(false);
+  const [wechatLoading, setWechatLoading] = useState(false);
   const [accountType, setAccountType] = useState<AccountType | null>(null);
   const [hasPassword, setHasPassword] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -96,7 +97,8 @@ export default function Login() {
       .then((res) => {
         if (res.token) {
           localStorage.setItem('token', res.token);
-          navigate('/home');
+          const isWeChat = localStorage.getItem('login_method') === 'wechat';
+          navigate(isWeChat ? '/chat' : '/home');
         }
       })
       .catch(() => {});
@@ -131,6 +133,17 @@ export default function Login() {
     } catch {
       toast.error(t('common.spaceLoginFailed'));
       setSpaceLoading(false);
+    }
+  };
+
+  const handleWeChatLoginClick = async () => {
+    setWechatLoading(true);
+    try {
+      const response = await httpClient.getWeChatAuthorizeUrl('/auth/wechat/callback');
+      window.location.href = response.authorize_url;
+    } catch {
+      toast.error(t('common.wechatLoginFailed'));
+      setWechatLoading(false);
     }
   };
 
@@ -216,7 +229,7 @@ export default function Login() {
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-6">
-          {/* Space Login - only show for space accounts */}
+          {/* Space Login - only show for space accounts *
           {showSpaceLogin && (
             <div className="space-y-3">
               <Button
@@ -260,9 +273,34 @@ export default function Login() {
                 {t('common.loginWithSpace')}
               </Button>
             </div>
-          )}
+          )} */}
 
-          {/* Divider - only show if both login methods are available */}
+          {/* WeChat Login */}
+          <div className="space-y-3">
+            <Button
+              type="button"
+              className="w-full cursor-pointer"
+              onClick={handleWeChatLoginClick}
+              disabled={wechatLoading}
+            >
+              {wechatLoading ? (
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              ) : (
+                <svg
+                  className="mr-2 h-4 w-4"
+                  viewBox="0 0 24 24"
+                  fill="currentColor"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path d="M8.691 2.188C3.891 2.188 0 5.476 0 9.53c0 2.212 1.17 4.203 3.002 5.55a.59.59 0 0 1 .213.665l-.39 1.48c-.019.07-.048.141-.048.213 0 .163.13.295.29.295a.326.326 0 0 0 .167-.054l1.903-1.114a.864.864 0 0 1 .717-.098 10.16 10.16 0 0 0 2.837.403c.276 0 .543-.027.811-.05-.857-2.578.157-4.972 1.932-6.446 1.703-1.415 3.882-1.98 5.853-1.838-.576-3.583-4.196-6.348-8.596-6.348zM5.785 5.991c.642 0 1.162.529 1.162 1.18a1.17 1.17 0 0 1-1.162 1.178A1.17 1.17 0 0 1 4.623 7.17c0-.651.52-1.18 1.162-1.18zm5.813 0c.642 0 1.162.529 1.162 1.18a1.17 1.17 0 0 1-1.162 1.178 1.17 1.17 0 0 1-1.162-1.178c0-.651.52-1.18 1.162-1.18z" />
+                  <path d="M14.662 13.578c-3.572 0-6.471 2.464-6.471 5.506 0 1.509.714 2.881 1.883 3.897.269.234.354.538.194.837l-.483.903a.265.265 0 0 0 .232.393.278.278 0 0 0 .144-.042l1.423-.822a.713.713 0 0 1 .635-.075c.795.274 1.63.41 2.443.41 3.572 0 6.471-2.465 6.471-5.506s-2.899-5.501-6.471-5.501zm-3.22 3.03c.48 0 .87.393.87.878a.874.874 0 0 1-.87.878.874.874 0 0 1-.87-.878c0-.485.39-.878.87-.878zm4.35 0c.48 0 .87.393.87.878a.874.874 0 0 1-.87.878.874.874 0 0 1-.87-.878c0-.485.39-.878.87-.878z" />
+                </svg>
+              )}
+              {t('common.loginWithWeChat')}
+            </Button>
+          </div>
+
+          {/* Divider - only show if both login methods are available *
           {showSpaceLogin && showLocalLogin && (
             <div className="relative">
               <div className="absolute inset-0 flex items-center">
@@ -274,9 +312,9 @@ export default function Login() {
                 </span>
               </div>
             </div>
-          )}
+          )} */}
 
-          {/* Local Account Login - show for local accounts or space accounts with password */}
+          {/* Local Account Login - show for local accounts or space accounts with password *
           {showLocalLogin && (
             <Form {...form}>
               <form
@@ -344,7 +382,7 @@ export default function Login() {
                 </Button>
               </form>
             </Form>
-          )}
+          )} */}
 
           <p className="text-xs text-center text-muted-foreground">
             {t('common.agreementNotice')}{' '}

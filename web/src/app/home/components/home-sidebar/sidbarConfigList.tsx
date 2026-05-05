@@ -31,6 +31,27 @@ export const sidebarConfigList = [
 
   // ── Home section ──
   new SidebarChildVO({
+    id: 'chat',
+    name: t('chat.title'),
+    icon: (
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        viewBox="0 0 24 24"
+        fill="currentColor"
+        className="text-blue-500"
+      >
+        <path d="M10 3H14V16H17L12 21L7 16H10V3Z"></path>
+      </svg>
+    ),
+    route: '/chat',
+    description: t('chat.description'),
+    helpLink: {
+      en_US: '',
+      zh_Hans: '',
+    },
+    section: 'home',
+  }),
+  new SidebarChildVO({
     id: 'monitoring',
     name: t('monitoring.title'),
     icon: (
